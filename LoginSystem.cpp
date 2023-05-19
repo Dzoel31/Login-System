@@ -20,39 +20,33 @@ void daftar()
     cout << "Nama : ";
     cin >> namaPengguna;
     fflush(stdin);
-    cout << "NIM : ";
-    cin >> NIM;
-    fflush(stdin);
     cout << "Kata sandi : ";
     cin >> password;
     fflush(stdin);
 
-    data.open("database.txt", ios::app | ios::in);
+    data.open("database.txt", ios::in);
 
-    data.seekg(0, ios::end);
-    if (data.tellg() == 0)
+    while (getline(data, currentData))
     {
-        data << NIM + " " + namaPengguna + " " + password + '\n';
-    }
-    else
-    {
-        // string currentData;
-        // while (1){
-        //     data >> currentData;
-        //     if (data.eof())
-        //     {
-        //         break;
-        //     }
-        //     cout << currentData;
-            
-        // }
-        if (status == 1)
+        istringstream str(currentData);
+        string currentNIM, currentUser, currentPassword;
+
+        str >> currentUser >> currentPassword;
+        if (namaPengguna == currentUser)
         {
-            data << NIM + " " + namaPengguna + " " + password + '\n';
+            cout << "Akun sudah terdaftar!" nL;
+            status = 0;
+            break;
         }
     }
-
     data.close();
+    if (status == 1)
+    {
+        ofstream data;
+        data.open("database.txt", ios::app);
+        data << namaPengguna + " " + password nL;
+        data.close();
+    }
 }
 
 void login()
@@ -98,7 +92,7 @@ void login()
         istringstream str(currentData);
         string currentUser, currentPassword;
 
-        str >> currentUser >> password;
+        str >> currentUser >> currentPassword;
 
         if (pengguna == currentUser && password == currentPassword)
         {
