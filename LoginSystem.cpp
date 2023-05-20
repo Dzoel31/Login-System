@@ -3,12 +3,9 @@
 #include <string>
 #include <conio.h>
 #include <sstream>
+#include <vector>
 
 #define nL << endl
-#define ENTER 13
-#define TAB 9
-#define BACKSPACE 8
-
 using namespace std;
 
 void daftar()
@@ -17,6 +14,9 @@ void daftar()
     int status = 1;
     fstream data;
     cout << "Silakan masukkan data Anda" nL;
+    cout << "Nim : ";
+    cin >> NIM;
+    fflush(stdin);
     cout << "Nama : ";
     cin >> namaPengguna;
     fflush(stdin);
@@ -31,8 +31,8 @@ void daftar()
         istringstream str(currentData);
         string currentNIM, currentUser, currentPassword;
 
-        str >> currentUser >> currentPassword;
-        if (namaPengguna == currentUser)
+        str >> currentNIM >> currentUser >> currentPassword;
+        if (NIM == currentNIM)
         {
             cout << "Akun sudah terdaftar!" nL;
             status = 0;
@@ -44,21 +44,23 @@ void daftar()
     {
         ofstream data;
         data.open("database.txt", ios::app);
-        data << namaPengguna + " " + password nL;
+        data << NIM + " " + namaPengguna + " " + password nL;
         data.close();
     }
 }
 
 void login()
 {
-    string pengguna, currentData, password;
+    string NIM, currentData, password;
     char c;
     int j;
+    bool check = true;
     ifstream data("database.txt");
+    vector<vector<string>> listData;
 
     cout << "====Login====" nL;
-    cout << "Masukkan nama : ";
-    cin >> pengguna;
+    cout << "Masukkan NIM : ";
+    cin >> NIM;
     cout << "password : ";
     do
     {
@@ -90,22 +92,38 @@ void login()
     while (getline(data, currentData))
     {
         istringstream str(currentData);
-        string currentUser, currentPassword;
+        string currentNIM, currentUser, currentPassword;
 
-        str >> currentUser >> currentPassword;
+        str >> currentNIM >> currentUser >> currentPassword;
+        listData.push_back({currentNIM, currentUser, currentPassword});
+    }
 
-        if (pengguna == currentUser && password == currentPassword)
+    for (int i = 0; i < listData.size(); i++)
+    {
+        if (NIM == listData[i][0])
         {
-            cout << "Berhasil login" nL;
-            status = 1;
+            check = true;
+            if (password == listData[i][2])
+            {
+                cout << "Selamat datang " << listData[i][1] nL;
+            }
+            else
+            {
+                cout << "password salah!" nL;
+            }
             break;
         }
+        else
+        {
+            check = false;
+        }
     }
-    if (status == 0)
+
+    if (check == false)
     {
-        cout << "Gagal login" nL;
-        cout << "Cek username dan password anda" nL;
+        cout << "Akun belum terdaftar!" nL;
     }
+
     data.close();
 }
 int main()
