@@ -10,19 +10,18 @@ using namespace std;
 
 void daftar()
 {
+    system("cls");
     string namaPengguna, NIM, password, currentData;
     int status = 1;
     fstream data;
+    cout << "####### Registrasi #######" nL;
     cout << "Silakan masukkan data Anda" nL;
     cout << "Nim : ";
     cin >> NIM;
-    fflush(stdin);
     cout << "Nama : ";
     cin >> namaPengguna;
-    fflush(stdin);
     cout << "Kata sandi : ";
     cin >> password;
-    fflush(stdin);
 
     data.open("database.txt", ios::in);
 
@@ -42,7 +41,6 @@ void daftar()
     data.close();
     if (status == 1)
     {
-        ofstream data;
         data.open("database.txt", ios::app);
         data << NIM + " " + namaPengguna + " " + password nL;
         data.close();
@@ -51,6 +49,7 @@ void daftar()
 
 void login()
 {
+    system("cls");
     string NIM, currentData, password;
     char c;
     int j;
@@ -58,7 +57,7 @@ void login()
     ifstream data("database.txt");
     vector<vector<string>> listData;
 
-    cout << "====Login====" nL;
+    cout << "####### Login #######" nL;
     cout << "Masukkan NIM : ";
     cin >> NIM;
     cout << "password : ";
@@ -156,7 +155,7 @@ int main()
             cout << "Enter untuk mengulang!";
             break;
         }
-        cout << "Ingin melanjutkan proses? (y/t)";
+        cout << "Ingin melanjutkan proses? (y/t) : ";
         cin >> ulang;
     } while (ulang != 't');
 
