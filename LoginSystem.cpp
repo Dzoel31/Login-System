@@ -25,19 +25,27 @@ void daftar()
 
     data.open("database.txt", ios::in);
 
-    while (getline(data, currentData))
+    if (data.is_open())
     {
-        istringstream str(currentData);
-        string currentNIM, currentUser, currentPassword;
-
-        str >> currentNIM >> currentUser >> currentPassword;
-        if (NIM == currentNIM)
+        while (getline(data, currentData))
         {
-            cout << "Akun sudah terdaftar!" nL;
-            status = 0;
-            break;
+            istringstream str(currentData);
+            string currentNIM, currentUser, currentPassword;
+
+            str >> currentNIM >> currentUser >> currentPassword;
+            if (NIM == currentNIM)
+            {
+                cout << "Akun sudah terdaftar!" nL;
+                status = 0;
+                break;
+            }
         }
     }
+    else
+    {
+        cout << "File tidak dapat dibuka!" nL;
+    }
+
     data.close();
     if (status == 1)
     {
@@ -55,56 +63,25 @@ void login()
     int j;
     bool check = true;
     ifstream data("database.txt");
-    vector<vector<string>> listData;
 
     cout << "####### Login #######" nL;
     cout << "Masukkan NIM : ";
     cin >> NIM;
     cout << "password : ";
-    do
-    {
-        c = getch();
-        switch (c)
-        {
-        case 0:
-            getch();
-            break;
-        case 13:
-            cout nL;
-            break;
-        case 8:
-            if (password.length() > 0)
-            {
-                password.erase(password.end() - 1);
-                cout << c << ' ' << c;
-            }
-            break;
+    cin >> password;
 
-        default:
-            password += c;
-            cout << "*";
-            break;
-        }
-    } while (c != 13);
-
-    int status = 0;
     while (getline(data, currentData))
     {
         istringstream str(currentData);
         string currentNIM, currentUser, currentPassword;
 
         str >> currentNIM >> currentUser >> currentPassword;
-        listData.push_back({currentNIM, currentUser, currentPassword});
-    }
-
-    for (int i = 0; i < listData.size(); i++)
-    {
-        if (NIM == listData[i][0])
+        if (NIM == currentNIM)
         {
             check = true;
-            if (password == listData[i][2])
+            if (password == currentPassword)
             {
-                cout << "Selamat datang " << listData[i][1] nL;
+                cout << "Selamat datang " << currentUser nL;
             }
             else
             {
