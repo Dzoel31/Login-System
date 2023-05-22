@@ -14,12 +14,14 @@ void daftar()
     string namaPengguna, NIM, password, currentData;
     int status = 1;
     fstream data;
+    vector<vector<string>> dataAccount;
     cout << "####### Registrasi #######" nL;
     cout << "Silakan masukkan data Anda" nL;
     cout << "Nim : ";
     cin >> NIM;
+    fflush(stdin);
     cout << "Nama : ";
-    cin >> namaPengguna;
+    getline(cin, namaPengguna);
     cout << "Kata sandi : ";
     cin >> password;
 
@@ -30,15 +32,13 @@ void daftar()
         while (getline(data, currentData))
         {
             istringstream str(currentData);
-            string currentNIM, currentUser, currentPassword;
-
-            str >> currentNIM >> currentUser >> currentPassword;
-            if (NIM == currentNIM)
+            string strSplit;
+            vector<string> temp;
+            while (getline(str, strSplit, ','))
             {
-                cout << "Akun sudah terdaftar!" nL;
-                status = 0;
-                break;
+                temp.push_back(strSplit);
             }
+            dataAccount.push_back(temp);
         }
         data.close();
     }
@@ -46,12 +46,22 @@ void daftar()
     {
         cout << "File tidak dapat dibuka!" nL;
     }
+    for (int i = 0; i < dataAccount.size(); i++)
+    {
+        if (NIM == dataAccount[i][0])
+        {
+            cout << "Akun sudah terdaftar!" nL;
+            status = 0;
+            break;
+        }
+    }
+
     if (status == 1)
     {
         data.open("database.txt", ios::app);
         if (data.is_open())
         {
-            data << NIM + " " + namaPengguna + " " + password nL;
+            data << NIM + "," + namaPengguna + "," + password nL;
             data.close();
         }
         else
@@ -69,6 +79,7 @@ void login()
     int j;
     bool check = true;
     ifstream data("database.txt");
+    vector<vector<string>> dataAccount;
 
     cout << "####### Login #######" nL;
     cout << "Masukkan NIM : ";
@@ -81,31 +92,40 @@ void login()
         while (getline(data, currentData))
         {
             istringstream str(currentData);
-            string currentNIM, currentUser, currentPassword;
+            string strSplit;
 
-            str >> currentNIM >> currentUser >> currentPassword;
-            if (NIM == currentNIM)
+            vector<string> temp;
+            while (getline(str, strSplit, ','))
             {
-                check = true;
-                if (password == currentPassword)
-                {
-                    cout << "Selamat datang " << currentUser nL;
-                }
-                else
-                {
-                    cout << "password salah!" nL;
-                }
-                break;
+                temp.push_back(strSplit);
             }
-            else
-            {
-                check = false;
-            }
+            dataAccount.push_back(temp);
         }
     }
     else
     {
         cout << "File tidak bisa dibuka!" nL;
+    }
+
+    for (int i = 0; i < dataAccount.size(); i++)
+    {
+        if (NIM == dataAccount[i][0])
+        {
+            check = true;
+            if (password == dataAccount[i][2])
+            {
+                cout << "Selamat datang " << dataAccount[i][1] nL;
+            }
+            else
+            {
+                cout << "password salah!" nL;
+            }
+            break;
+        }
+        else
+        {
+            check = false;
+        }
     }
 
     if (check == false)
