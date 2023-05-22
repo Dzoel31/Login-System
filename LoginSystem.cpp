@@ -27,25 +27,18 @@ void daftar()
 
     data.open("database.txt", ios::in);
 
-    if (data.is_open())
+    while (getline(data, currentData))
     {
-        while (getline(data, currentData))
+        istringstream str(currentData);
+        string strSplit;
+        vector<string> temp;
+        while (getline(str, strSplit, ','))
         {
-            istringstream str(currentData);
-            string strSplit;
-            vector<string> temp;
-            while (getline(str, strSplit, ','))
-            {
-                temp.push_back(strSplit);
-            }
-            dataAccount.push_back(temp);
+            temp.push_back(strSplit);
         }
-        data.close();
+        dataAccount.push_back(temp);
     }
-    else
-    {
-        cout << "File tidak dapat dibuka!" nL;
-    }
+    data.close();
     for (int i = 0; i < dataAccount.size(); i++)
     {
         if (NIM == dataAccount[i][0])
