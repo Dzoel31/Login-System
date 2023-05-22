@@ -40,18 +40,24 @@ void daftar()
                 break;
             }
         }
+        data.close();
     }
     else
     {
         cout << "File tidak dapat dibuka!" nL;
     }
-
-    data.close();
     if (status == 1)
     {
         data.open("database.txt", ios::app);
-        data << NIM + " " + namaPengguna + " " + password nL;
-        data.close();
+        if (data.is_open())
+        {
+            data << NIM + " " + namaPengguna + " " + password nL;
+            data.close();
+        }
+        else
+        {
+            cout << "File tidak dapat dibuka!" nL;
+        }
     }
 }
 
@@ -70,29 +76,36 @@ void login()
     cout << "password : ";
     cin >> password;
 
-    while (getline(data, currentData))
+    if (data.is_open())
     {
-        istringstream str(currentData);
-        string currentNIM, currentUser, currentPassword;
-
-        str >> currentNIM >> currentUser >> currentPassword;
-        if (NIM == currentNIM)
+        while (getline(data, currentData))
         {
-            check = true;
-            if (password == currentPassword)
+            istringstream str(currentData);
+            string currentNIM, currentUser, currentPassword;
+
+            str >> currentNIM >> currentUser >> currentPassword;
+            if (NIM == currentNIM)
             {
-                cout << "Selamat datang " << currentUser nL;
+                check = true;
+                if (password == currentPassword)
+                {
+                    cout << "Selamat datang " << currentUser nL;
+                }
+                else
+                {
+                    cout << "password salah!" nL;
+                }
+                break;
             }
             else
             {
-                cout << "password salah!" nL;
+                check = false;
             }
-            break;
         }
-        else
-        {
-            check = false;
-        }
+    }
+    else
+    {
+        cout << "File tidak bisa dibuka!" nL;
     }
 
     if (check == false)
