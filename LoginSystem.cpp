@@ -7,6 +7,26 @@
 #define nL << endl
 using namespace std;
 
+auto readData()
+{
+    ifstream data("database.txt");
+    vector<vector<string>> dataAccount;
+    string currentData, subString, strSplit;
+    while (getline(data, currentData))
+    {
+        subString = currentData.substr(1, (currentData.length() - 2));
+        istringstream strEdit(subString);
+        vector<string> temp;
+        while (getline(strEdit, strSplit, ';'))
+        {
+            temp.push_back(strSplit);
+        }
+        dataAccount.push_back(temp);
+    }
+    data.close();
+    return dataAccount;
+}
+
 bool validatePassword(string password)
 {
     bool hasNumber, hasUpper, hasLower;
@@ -38,10 +58,10 @@ bool validatePassword(string password)
 void daftar()
 {
     system("cls");
-    string namaPengguna, NIM, password, currentData, confirmPassword;
-    int status = 1;
+    string namaPengguna, NIM, password, confirmPassword;
+    bool check = true;
     fstream data;
-    vector<vector<string>> dataAccount;
+    vector<vector<string>> dataAccount = readData();
     cout << "####### Registrasi #######" nL;
     cout << "Silakan masukkan data Anda" nL;
     cout << "Nim : ";
@@ -52,64 +72,69 @@ void daftar()
     cout << "Password : ";
     cin >> password;
 
-    if (validatePassword(password))
+    if (NIM.length() == 10)
     {
-        cout << "Konfirmasi password : ";
-        cin >> confirmPassword;
-
-        data.open("database.txt", ios::in);
-
-        while (getline(data, currentData))
+        if (namaPengguna.length() <= 20)
         {
-            string subString = currentData.substr(1, (currentData.length() - 2));
-            istringstream str(subString);
-            string strSplit;
-            vector<string> temp;
-            while (getline(str, strSplit, ';'))
+            if (password.length() >= 8)
             {
-                temp.push_back(strSplit);
-            }
-            dataAccount.push_back(temp);
-        }
-        data.close();
-        for (int i = 0; i < dataAccount.size(); i++)
-        {
-            if (NIM == dataAccount[i][0])
-            {
-                cout << "NIM akun tidak dapat digunakan!" nL;
-                status = 0;
-                break;
-            }
-        }
-
-        if (status == 1)
-        {
-            if (password == confirmPassword)
-            {
-                data.open("database.txt", ios::app);
-                if (data.is_open())
+                if (validatePassword(password))
                 {
-                    data << "#" + NIM + ";" + namaPengguna + ";" + password + "#" nL;
-                    cout << "Akun berhasil didaftarkan!" nL;
-                    data.close();
+                    cout << "Konfirmasi password : ";
+                    cin >> confirmPassword;
+                    for (int i = 0; i < dataAccount.size(); i++)
+                    {
+                        if (NIM == dataAccount[i][0])
+                        {
+                            cout << "NIM akun tidak dapat digunakan!" nL;
+                            check = false;
+                            break;
+                        }
+                    }
+
+                    if (check)
+                    {
+                        if (password == confirmPassword)
+                        {
+                            data.open("database.txt", ios::app);
+                            if (data.is_open())
+                            {
+                                data << "#" + NIM + ";" + namaPengguna + ";" + password + "#" nL;
+                                cout << "Akun berhasil didaftarkan!" nL;
+                                data.close();
+                            }
+                            else
+                            {
+                                cout << "File tidak dapat dibuka!" nL;
+                            }
+                        }
+                        else
+                        {
+                            cout << "password tidak sesuai!" nL;
+                        }
+                    }
                 }
                 else
                 {
-                    cout << "File tidak dapat dibuka!" nL;
+                    cout << "Password harus terdiri dari campuran huruf besar, huruf kecil dan angka!" nL;
+                    cin.get();
+                    cin.ignore();
+                    daftar();
                 }
             }
             else
             {
-                cout << "password tidak sesuai!" nL;
+                cout << "Panjang password minimal 8 karakter!" nL;
             }
+        }
+        else
+        {
+            cout << "Panjang nama tidak boleh lebih dari 20 karakter!" nL;
         }
     }
     else
     {
-        cout << "Password harus terdiri dari campuran huruf besar, huruf kecil dan angka!" nL;
-        cin.get();
-        cin.ignore();
-        daftar();
+        cout << "Panjang NIM harus 10 karakter!" nL;
     }
 }
 
@@ -120,36 +145,13 @@ void login()
     char c;
     int j;
     bool check = true;
-    ifstream data("database.txt");
-    vector<vector<string>> dataAccount;
+    vector<vector<string>> dataAccount = readData();
 
     cout << "####### Login #######" nL;
     cout << "Masukkan NIM : ";
     cin >> NIM;
     cout << "password : ";
     cin >> password;
-
-    if (data.is_open())
-    {
-        while (getline(data, currentData))
-        {
-            string subString = currentData.substr(1, (currentData.length() - 2));
-            istringstream str(subString);
-            string strSplit;
-
-            vector<string> temp;
-            while (getline(str, strSplit, ';'))
-            {
-                temp.push_back(strSplit);
-            }
-            dataAccount.push_back(temp);
-        }
-        data.close();
-    }
-    else
-    {
-        cout << "File tidak bisa dibuka!" nL;
-    }
 
     for (int i = 0; i < dataAccount.size(); i++)
     {
@@ -176,29 +178,13 @@ void login()
     {
         cout << "Akun belum terdaftar!" nL;
     }
-
 }
 
 void deleteData(string NIM)
 {
     system("cls");
-    vector<vector<string>> dataAccount;
+    vector<vector<string>> dataAccount = readData();
     fstream data;
-    data.open("database.txt", ios::in);
-    string str;
-    while (getline(data, str))
-    {
-        string subString = str.substr(1, (str.length() - 2));
-        stringstream strEdit(subString);
-        string strSplit;
-        vector<string> temp;
-        while (getline(strEdit, strSplit, ';'))
-        {
-            temp.push_back(strSplit);
-        }
-        dataAccount.push_back(temp);
-    }
-    data.close();
     for (int i = 0; i < dataAccount.size(); i++)
     {
         if (dataAccount[i][0] == NIM)
@@ -228,23 +214,9 @@ void deleteData(string NIM)
 void updateData(string NIM)
 {
     system("cls");
-    vector<vector<string>> dataAccount;
+    vector<vector<string>> dataAccount = readData();
     fstream data;
-    data.open("database.txt", ios::in);
-    string str, newPassword, validatePassword;
-    while (getline(data, str))
-    {
-        string subString = str.substr(1, (str.length() - 2));
-        stringstream strEdit(subString);
-        string strSplit;
-        vector<string> temp;
-        while (getline(strEdit, strSplit, ';'))
-        {
-            temp.push_back(strSplit);
-        }
-        dataAccount.push_back(temp);
-    }
-    data.close();
+    string newPassword, validatePassword;
     for (int i = 0; i < dataAccount.size(); i++)
     {
         if (dataAccount[i][0] == NIM)
