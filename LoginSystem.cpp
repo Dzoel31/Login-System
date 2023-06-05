@@ -9,7 +9,7 @@ using namespace std;
 
 auto readData()
 {
-    ifstream data("database.txt");
+    ifstream data("kelas_B.txt");
     vector<vector<string>> dataAccount;
     string currentData, subString, strSplit;
     while (getline(data, currentData))
@@ -96,7 +96,7 @@ void daftar()
                     {
                         if (password == confirmPassword)
                         {
-                            data.open("database.txt", ios::app);
+                            data.open("kelas_B.txt", ios::app);
                             if (data.is_open())
                             {
                                 data << "#" + NIM + ";" + namaPengguna + ";" + password + "#" nL;
@@ -160,7 +160,10 @@ void login()
             check = true;
             if (password == dataAccount[i][2])
             {
-                cout << "Selamat datang " << dataAccount[i][1] nL;
+                system("cls");
+                cout << "Selamat datang" nL;
+                cout << "NIM : " << dataAccount[i][0] nL;
+                cout << "Nama : " << dataAccount[i][1] nL;
             }
             else
             {
@@ -194,7 +197,7 @@ void deleteData(string NIM)
             dataAccount.insert(dataAccount.begin() + i, {"*"});
         }
     }
-    data.open("database.txt", ios::out);
+    data.open("kelas_B.txt", ios::out);
     for (auto baris : dataAccount)
     {
         data << "#";
@@ -226,20 +229,22 @@ void updateData(string NIM)
             cin >> newPassword;
             cout << "Masukkan kembali password anda : ";
             cin >> validatePassword;
-            if (newPassword == validatePassword)
-            {
-                dataAccount[i][2] = newPassword;
-                break;
-            }
-            else
+            while (newPassword != validatePassword)
             {
                 cout << "Password salah!\nTekan enter untuk mengulang!\n";
                 cin.get();
                 cin.ignore();
+                system("cls");
+                cout << "Password lama anda : " << dataAccount[i][2] nL;
+                cout << "Password baru anda : ";
+                cin >> newPassword;
+                cout << "Masukkan kembali password anda : ";
+                cin >> validatePassword;
             }
+            dataAccount[i][2] = newPassword;
         }
     }
-    data.open("database.txt", ios::out);
+    data.open("kelas_B.txt", ios::out);
     for (auto baris : dataAccount)
     {
         data << "#";
@@ -299,7 +304,7 @@ int main()
             cout << "Enter untuk mengulang!";
             break;
         }
-        cout << "Ingin melanjutkan proses? (y/t) : ";
+        cout << "\nIngin melanjutkan proses? (y/t) : ";
         cin >> ulang;
     } while (ulang != 't');
 
