@@ -27,6 +27,24 @@ auto readData()
     return dataAccount;
 }
 
+void writeData(vector<vector<string>> dataAccount)
+{
+    ofstream data("kelas_B.txt");
+    for (auto baris : dataAccount)
+    {
+        data << "#";
+        for (int i = 0; i < baris.size(); i++)
+        {
+            data << baris[i];
+            if (i != baris.size() - 1)
+            {
+                data << ";";
+            }
+        }
+        data << "#" << endl;
+    }
+    data.close();
+}
 bool validatePassword(string password)
 {
     bool hasNumber, hasUpper, hasLower;
@@ -187,38 +205,20 @@ void deleteData(string NIM)
 {
     system("cls");
     vector<vector<string>> dataAccount = readData();
-    fstream data;
     for (int i = 0; i < dataAccount.size(); i++)
     {
         if (dataAccount[i][0] == NIM)
         {
             dataAccount.erase(dataAccount.begin() + i);
-
-            dataAccount.insert(dataAccount.begin() + i, {"*"});
         }
     }
-    data.open("kelas_B.txt", ios::out);
-    for (auto baris : dataAccount)
-    {
-        data << "#";
-        for (int i = 0; i < baris.size(); i++)
-        {
-            data << baris[i];
-            if (i != baris.size() - 1)
-            {
-                data << ";";
-            }
-        }
-        data << "#" << endl;
-    }
-    data.close();
+    writeData(dataAccount);
 }
 
 void updateData(string NIM)
 {
     system("cls");
     vector<vector<string>> dataAccount = readData();
-    fstream data;
     string newPassword, validatePassword;
     for (int i = 0; i < dataAccount.size(); i++)
     {
@@ -244,22 +244,9 @@ void updateData(string NIM)
             dataAccount[i][2] = newPassword;
         }
     }
-    data.open("kelas_B.txt", ios::out);
-    for (auto baris : dataAccount)
-    {
-        data << "#";
-        for (int i = 0; i < baris.size(); i++)
-        {
-            data << baris[i];
-            if (i != baris.size() - 1)
-            {
-                data << ";";
-            }
-        }
-        data << "#" << endl;
-    }
-    data.close();
+    writeData(dataAccount);
 }
+
 int main()
 {
     int pilihMenu;
