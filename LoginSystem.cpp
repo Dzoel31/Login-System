@@ -42,16 +42,13 @@ void writeData(vector<vector<string>> dataAccount)
         data << "#";
         for (int i = 0; i < baris.size(); i++)
         {
-            data << baris[i];
-            if (i != baris.size() - 1)
-            {
-                data << ";";
-            }
+            data << baris[i] + ";";
         }
         data nL;
     }
     data.close();
 }
+
 bool validatePassword(string NIM, string password)
 {
     bool hasNumber, hasUpper, match;
@@ -76,6 +73,7 @@ bool validatePassword(string NIM, string password)
         return false;
     }
 }
+
 void daftar()
 {
     system("cls");
@@ -116,7 +114,7 @@ void daftar()
                         data.open("kelas_B.txt", ios::app);
                         if (data.is_open())
                         {
-                            data << "#" + NIM + ";" + namaPengguna + ";" + password nL;
+                            data << "#" + NIM + ";" + namaPengguna + ";" + password + ";" nL;
                             cout << "Akun berhasil didaftarkan!" nL;
                             data.close();
                         }
@@ -207,12 +205,15 @@ void deleteData(string NIM)
     system("cls");
     vector<vector<string>> dataAccount = readData();
     bool unRegistered = true;
-    for (int i = 0; i < dataAccount.size(); i++)
+    int i;
+    string confirm;
+
+    for (i = 0; i < dataAccount.size(); i++)
     {
         if (dataAccount[i][0] == NIM)
         {
             unRegistered = false;
-            dataAccount.erase(dataAccount.begin() + i);
+            break;
         }
     }
     if (unRegistered)
@@ -221,8 +222,22 @@ void deleteData(string NIM)
     }
     else
     {
-        cout << "Data " + NIM + " berhasil dihapus!" nL;
+        cout << "Nama anda : " << dataAccount[i][1] nL;
+        cout << "Masukkan kode akses anda : ";
+        cin >> confirm;
+        while (confirm != dataAccount[i][2])
+        {
+            cout << "Kode akses anda tidak sesuai!\nTekar enter untuk lanjut!" nL;
+            cin.get();
+            cin.ignore();
+            system("cls");
+            cout << "Nama anda : " << dataAccount[i][1] nL;
+            cout << "Masukkan kode akses anda : ";
+            cin >> confirm;
+        }
+        dataAccount.erase(dataAccount.begin() + i);
         writeData(dataAccount);
+        cout << "Data " + NIM + " berhasil dihapus!" nL;
     }
 }
 
@@ -321,9 +336,10 @@ int main()
             cout << "Enter untuk mengulang!";
             break;
         }
-        cout << "\nIngin melanjutkan proses? (y/t) : ";
+        cout << "\nIngin melanjutkan proses? (Y/N) : ";
         cin >> ulang;
-    } while (ulang != 't');
+        toupper(ulang);
+    } while (ulang != 'N');
 
     return 0;
 }
