@@ -12,19 +12,26 @@ auto readData()
     ifstream data("kelas_B.txt");
     vector<vector<string>> dataAccount;
     string currentData, subString, strSplit;
-    while (getline(data, currentData))
+    if (!data.is_open())
     {
-        subString = currentData.substr(1, (currentData.length() - 2));
-        istringstream strEdit(subString);
-        vector<string> temp;
-        while (getline(strEdit, strSplit, ';'))
-        {
-            temp.push_back(strSplit);
-        }
-        dataAccount.push_back(temp);
+        return dataAccount;
     }
-    data.close();
-    return dataAccount;
+    else
+    {
+        while (getline(data, currentData))
+        {
+            subString = currentData.substr(1, (currentData.length() - 1));
+            istringstream strEdit(subString);
+            vector<string> temp;
+            while (getline(strEdit, strSplit, ';'))
+            {
+                temp.push_back(strSplit);
+            }
+            dataAccount.push_back(temp);
+        }
+        data.close();
+        return dataAccount;
+    }
 }
 
 void writeData(vector<vector<string>> dataAccount)
@@ -41,30 +48,26 @@ void writeData(vector<vector<string>> dataAccount)
                 data << ";";
             }
         }
-        data << "#" << endl;
+        data nL;
     }
     data.close();
 }
-bool validatePassword(string password)
+bool validatePassword(string NIM, string password)
 {
-    bool hasNumber, hasUpper, hasLower;
-    hasNumber = hasUpper = hasLower = false;
+    bool hasNumber, hasUpper, match;
+    hasNumber = hasUpper = match = false;
     for (int i = 0; i < password.length(); i++)
     {
-        if (islower(password[i]))
-        {
-            hasLower = true;
-        }
-        if (isupper(password[i]))
+        if (isupper(password[i]) && i < 2)
         {
             hasUpper = true;
         }
-        if (isdigit(password[i]))
+        if (isdigit(password[i]) && i > 2)
         {
             hasNumber = true;
         }
     }
-    if ((hasLower || hasUpper) && hasNumber)
+    if (hasUpper && hasNumber && (NIM == password.substr(2, password.length() - 1)))
     {
         return true;
     }
@@ -76,7 +79,7 @@ bool validatePassword(string password)
 void daftar()
 {
     system("cls");
-    string namaPengguna, NIM, password, confirmPassword;
+    string namaPengguna, NIM, password;
     bool check = true;
     fstream data;
     vector<vector<string>> dataAccount = readData();
@@ -84,7 +87,7 @@ void daftar()
     cout << "Silakan masukkan data Anda" nL;
     cout << "Nim : ";
     cin >> NIM;
-    fflush(stdin);
+    cin.ignore();
     cout << "Nama : ";
     getline(cin, namaPengguna);
     cout << "Password : ";
@@ -94,17 +97,15 @@ void daftar()
     {
         if (namaPengguna.length() <= 20)
         {
-            if (password.length() >= 8)
+            if (password.length() == 12)
             {
-                if (validatePassword(password))
+                if (validatePassword(NIM, password))
                 {
-                    cout << "Konfirmasi password : ";
-                    cin >> confirmPassword;
                     for (int i = 0; i < dataAccount.size(); i++)
                     {
-                        if (NIM == dataAccount[i][0])
+                        if (NIM == dataAccount[i][0] || password == dataAccount[i][2])
                         {
-                            cout << "NIM akun tidak dapat digunakan!" nL;
+                            cout << "NIM atau password tidak dapat digunakan!" nL;
                             check = false;
                             break;
                         }
@@ -112,47 +113,47 @@ void daftar()
 
                     if (check)
                     {
-                        if (password == confirmPassword)
+                        data.open("kelas_B.txt", ios::app);
+                        if (data.is_open())
                         {
-                            data.open("kelas_B.txt", ios::app);
-                            if (data.is_open())
-                            {
-                                data << "#" + NIM + ";" + namaPengguna + ";" + password + "#" nL;
-                                cout << "Akun berhasil didaftarkan!" nL;
-                                data.close();
-                            }
-                            else
-                            {
-                                cout << "File tidak dapat dibuka!" nL;
-                            }
+                            data << "#" + NIM + ";" + namaPengguna + ";" + password nL;
+                            cout << "Akun berhasil didaftarkan!" nL;
+                            data.close();
                         }
                         else
                         {
-                            cout << "password tidak sesuai!" nL;
+                            cout << "File tidak dapat dibuka!" nL;
                         }
                     }
                 }
                 else
                 {
-                    cout << "Password harus terdiri dari campuran huruf besar, huruf kecil dan angka!" nL;
-                    cin.get();
-                    cin.ignore();
-                    daftar();
+                    cout << "Password harus terdiri dari 2 huruf kapital dan diikuti oleh NIM anda!" nL;
+                    check = false;
                 }
             }
             else
             {
-                cout << "Panjang password minimal 8 karakter!" nL;
+                cout << "Panjang password minimal 12 karakter!" nL;
+                check = false;
             }
         }
         else
         {
             cout << "Panjang nama tidak boleh lebih dari 20 karakter!" nL;
+            check = false;
         }
     }
     else
     {
         cout << "Panjang NIM harus 10 karakter!" nL;
+        check = false;
+    }
+    if (!check)
+    {
+        cin.get();
+        cin.ignore();
+        daftar();
     }
 }
 
@@ -205,21 +206,31 @@ void deleteData(string NIM)
 {
     system("cls");
     vector<vector<string>> dataAccount = readData();
+    bool unRegistered = true;
     for (int i = 0; i < dataAccount.size(); i++)
     {
         if (dataAccount[i][0] == NIM)
         {
+            unRegistered = false;
             dataAccount.erase(dataAccount.begin() + i);
         }
     }
-    writeData(dataAccount);
+    if (unRegistered)
+    {
+        cout << "Akun belum terdaftar!" nL;
+    }
+    else
+    {
+        cout << "Data " + NIM + " berhasil dihapus!" nL;
+        writeData(dataAccount);
+    }
 }
 
 void updateData(string NIM)
 {
     system("cls");
     vector<vector<string>> dataAccount = readData();
-    string newPassword, validatePassword;
+    string newPassword;
     for (int i = 0; i < dataAccount.size(); i++)
     {
         if (dataAccount[i][0] == NIM)
@@ -227,24 +238,40 @@ void updateData(string NIM)
             cout << "Password lama anda : " << dataAccount[i][2] nL;
             cout << "Password baru anda : ";
             cin >> newPassword;
-            cout << "Masukkan kembali password anda : ";
-            cin >> validatePassword;
-            while (newPassword != validatePassword)
+            if (newPassword == dataAccount[i][2])
             {
-                cout << "Password salah!\nTekan enter untuk mengulang!\n";
-                cin.get();
-                cin.ignore();
-                system("cls");
-                cout << "Password lama anda : " << dataAccount[i][2] nL;
-                cout << "Password baru anda : ";
-                cin >> newPassword;
-                cout << "Masukkan kembali password anda : ";
-                cin >> validatePassword;
+                cout << "Password lama dan baru anda sama, tidak terjadi perubahan!" nL;
             }
-            dataAccount[i][2] = newPassword;
+            else
+            {
+
+                while (!validatePassword(NIM, newPassword))
+                {
+                    cout << "Password harus terdiri dari 2 huruf kapital dan diikuti oleh NIM Anda!\nTekan enter untuk mengulang!\n";
+                    cin.get();
+                    cin.ignore();
+                    system("cls");
+                    cout << "Password lama anda : " << dataAccount[i][2] nL;
+                    cout << "Password baru anda : ";
+                    cin >> newPassword;
+                }
+                dataAccount[i][2] = newPassword;
+                cout << "Password anda berhasil diubah!" nL;
+            }
         }
     }
     writeData(dataAccount);
+}
+
+void lihatData()
+{
+    system("cls");
+    ifstream data("kelas_B.txt");
+    string currentData;
+    while (getline(data, currentData))
+    {
+        cout << currentData nL;
+    }
 }
 
 int main()
@@ -258,8 +285,9 @@ int main()
         cout << "==========" nL;
         cout << "[1] Regis" nL;
         cout << "[2] Login" nL;
-        cout << "[3] Delete" nL;
-        cout << "[4] Update" nL;
+        cout << "[3] Lihat Data" nL;
+        cout << "[4] Delete" nL;
+        cout << "[5] Update" nL;
         cout << "[0] keluar" nL;
         cout << "Pilih menu : ";
         cin >> pilihMenu;
@@ -272,13 +300,15 @@ int main()
             login();
             break;
         case 3:
+            lihatData();
+            break;
+        case 4:
             cout << "Masukkan NIM akun yang akan dihapus : ";
             cin >> NIM;
             deleteData(NIM);
-            cout << "Data " + NIM + " berhasil dihapus!" nL;
             break;
-        case 4:
-            cout << "Masukkan NIM akun yang akan diupdate : ";
+        case 5:
+            cout << "Masukkan NIM akun : ";
             cin >> NIM;
             updateData(NIM);
             break;
