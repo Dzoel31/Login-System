@@ -108,7 +108,6 @@ void daftar()
                             break;
                         }
                     }
-
                     if (check)
                     {
                         data.open("kelas_B.txt", ios::app);
@@ -193,7 +192,6 @@ void login()
             check = false;
         }
     }
-
     if (check == false)
     {
         cout << "Akun belum terdaftar!" nL;
@@ -241,43 +239,6 @@ void deleteData(string NIM)
     }
 }
 
-void updateData(string NIM)
-{
-    system("cls");
-    vector<vector<string>> dataAccount = readData();
-    string newPassword;
-    for (int i = 0; i < dataAccount.size(); i++)
-    {
-        if (dataAccount[i][0] == NIM)
-        {
-            cout << "Password lama anda : " << dataAccount[i][2] nL;
-            cout << "Password baru anda : ";
-            cin >> newPassword;
-            if (newPassword == dataAccount[i][2])
-            {
-                cout << "Password lama dan baru anda sama, tidak terjadi perubahan!" nL;
-            }
-            else
-            {
-
-                while (!validatePassword(NIM, newPassword))
-                {
-                    cout << "Password harus terdiri dari 2 huruf kapital dan diikuti oleh NIM Anda!\nTekan enter untuk mengulang!\n";
-                    cin.get();
-                    cin.ignore();
-                    system("cls");
-                    cout << "Password lama anda : " << dataAccount[i][2] nL;
-                    cout << "Password baru anda : ";
-                    cin >> newPassword;
-                }
-                dataAccount[i][2] = newPassword;
-                cout << "Password anda berhasil diubah!" nL;
-            }
-        }
-    }
-    writeData(dataAccount);
-}
-
 void lihatData()
 {
     system("cls");
@@ -302,7 +263,6 @@ int main()
         cout << "[2] Login" nL;
         cout << "[3] Lihat Data" nL;
         cout << "[4] Delete" nL;
-        cout << "[5] Update" nL;
         cout << "[0] keluar" nL;
         cout << "Pilih menu : ";
         cin >> pilihMenu;
@@ -322,11 +282,6 @@ int main()
             cin >> NIM;
             deleteData(NIM);
             break;
-        case 5:
-            cout << "Masukkan NIM akun : ";
-            cin >> NIM;
-            updateData(NIM);
-            break;
         case 0:
             cout << "Exit program...";
             exit(1);
@@ -340,6 +295,6 @@ int main()
         cin >> ulang;
         toupper(ulang);
     } while (ulang != 'N');
-
+    
     return 0;
 }
